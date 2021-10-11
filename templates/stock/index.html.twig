@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stock list!{% endblock %}
+
+{% block body %}
+
+
+    <div class="example-wrapper">
+        <h1>List of Stocks</h1>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Symbol</td>
+                <td>Short Name</td>
+                <td>Currency</td>
+                <td>Price</td>
+                <td>Previous Closing</td>
+                <td>Exchange</td>
+                <td>Actions</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.shortName }}</td>
+                    <td>{{ stock.currency }}</td>
+                    <td>{{ stock.price }}</td>
+                    <td>{{ stock.previousClose }}</td>
+                    <td>{{ stock.exchangeName }}</td>
+                    <td> <a class="url" href="{{ path('stocks.fetch', {'symbol': stock.symbol}) }}">Refresh</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
