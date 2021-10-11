@@ -1,14 +1,5 @@
 # Readme #
 
-## Books ##
-`books`
-
-`books/create`
-
-`books/show/1`
-
-`books/delete/1`
-
 ## Stocks ##
 ***Note:*** you will need to register `https://rapidapi.com/apidojo/api/yh-finance/` and update .env with `RAPID_API_KEY=`
 
