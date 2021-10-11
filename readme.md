@@ -1,7 +1,7 @@
 # Readme #
 
 ## Stocks ##
-***Note:*** you will need to register `https://rapidapi.com/apidojo/api/yh-finance/` and update .env with `RAPID_API_KEY=`
+***Note:*** We need to register `https://rapidapi.com/apidojo/api/yh-finance/` and update .env with `RAPID_API_KEY=`
 
 Route: `stocks`
 
