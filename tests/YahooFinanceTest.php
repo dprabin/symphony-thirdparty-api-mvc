@@ -20,11 +20,10 @@ class YahooFinanceTest extends KernelTestCase
     }
 
     /** @test */
-    public function test_stock_record_can_be_created_in_the_database(): void
+    public function test_if_stock_record_can_be_created_in_the_database(): void
     {
         //setup
         $stock = new Stock();
-
         $stock->setSymbol('AMZN');
         $stock->setShortName('Amazon Inc');
         $stock->setCurrency('USD');
@@ -53,4 +52,5 @@ class YahooFinanceTest extends KernelTestCase
         $this->assertEquals(1100, $stockRecord->getPreviousClose());
         $this->assertEquals(-100, $stockRecord->getPriceChange());
     }
+
 }
