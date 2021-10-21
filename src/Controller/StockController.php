@@ -25,9 +25,7 @@ class StockController extends AbstractController
                                 SerializerInterface       $serializer)
     {
         $this->entityManager = $entityManager;
-
         $this->financeApiClient = $financeApiClient;
-
         $this->serializer = $serializer;
     }
 
@@ -56,10 +54,6 @@ class StockController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-//            $em = $this->getDoctrine()->getManager();
-//            $em->persist($stock);
-//            $em->flush();
-
             /** @var JsonResponse $stockProfile */
             $stockProfile = $this->financeApiClient->fetchStockProfile($stock->getSymbol(), 'US');
 
@@ -77,23 +71,32 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/fetch", name="fetch")
+     * @Route("/update", name="update")
      */
-    public function fetch(Request $request, StockRepository $stockRepository)
+    public function updateStock(Request $request, StockRepository $stockRepository)
     {
+        /**
+         * @var StockRepository @stockCheck
+         * Check whether there is stock in the database before updating
+         */
+        $stockCheck = $stockRepository->findOneBy(['symbol' => $request->get('symbol')]);
+        if (!$stockCheck) {
+            $this->addFlash('error', 'Can\'t update stock profile ' . $request->get('symbol') . ', which is not present in database.');
+            return $this->redirect($this->generateUrl('stocks.index'));
+        }
+
         /** @var JsonResponse $stockProfile */
         $stockProfile = $this->financeApiClient->fetchStockProfile($request->get('symbol'), 'US');
 
-        if ($stockProfile->getStatusCode() !== 200) {
-            $this->addFlash('error', 'Stock profile of ' . $request->get('symbol') . ' couldn\t be updated.');
-
+        $statusCode= $stockProfile->getStatusCode();
+        if ($statusCode !== 200) {
+            $this->addFlash('error', 'Stock profile of ' . $request->get('symbol') . ' couldn\'t be updated.' . ' Error '.$statusCode);
             return $this->redirect($this->generateUrl('stocks.index'));
         }
 
         /** @var Stock $stock */
         $stock = $this->serializer->deserialize($stockProfile->getContent(), Stock::class, 'json');
         $stock1 = $stockRepository->findOneBy(['symbol' => $stock->getSymbol()]);
-
         if ($stock1) {
             $stock1->setPrice($stock->getPrice());
             $stock1->setPreviousClose($stock->getPreviousClose());
@@ -105,7 +108,36 @@ class StockController extends AbstractController
 
         $this->entityManager->flush();
 
-        $this->addFlash('success', 'Stock profile of ' . $stock->getShortName() . ' updated');
+        $this->addFlash('success', 'Stock profile of ' . $stock->getShortName() . ' updated.');
+
+        return $this->redirect($this->generateUrl('stocks.index'));
+    }
+
+    /**
+     * @Route("/delete", name="delete")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function deleteStock(Request $request)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $stock = $entityManager
+                    ->getRepository(Stock::class)
+                    ->findOneBy([
+                        'symbol' => $request->get('symbol')
+                    ]);
+
+        #$stock = $stockRepository->findOneBy(['symbol' => $request->get('symbol')]);
+        if (!$stock) {
+            $this->addFlash('error', 'Can\'t update stock profile ' . $request->get('symbol') . ', which is not present in database.');
+            return $this->redirect($this->generateUrl('stocks.index'));
+        }
+
+        
+        $entityManager->remove($stock);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Stock profile of ' . $stock->getShortName() . ' deleted.');
 
         return $this->redirect($this->generateUrl('stocks.index'));
     }

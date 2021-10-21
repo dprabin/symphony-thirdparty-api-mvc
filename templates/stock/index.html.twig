@@ -28,7 +28,10 @@
                     <td>{{ stock.price }}</td>
                     <td>{{ stock.previousClose }}</td>
                     <td>{{ stock.exchangeName }}</td>
-                    <td> <a class="url" href="{{ path('stocks.fetch', {'symbol': stock.symbol}) }}">Refresh</a></td>
+                    <td>
+                        <a class="url" href="{{ path('stocks.update', {'symbol': stock.symbol}) }}">Updates</a>
+                        <a class="url" href="{{ path('stocks.delete', {'symbol': stock.symbol}) }}">Delete</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
